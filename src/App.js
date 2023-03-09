@@ -41,7 +41,7 @@ const App = () => {
           value={newTask}
           placeholder="+ Add a Task"
           onChangeText={_handleTextChange}
-          onSubmit={_addTask}
+          onSubmitEditing={_addTask}
         />
       </Container>
     </ThemeProvider>
