@@ -17,7 +17,7 @@ const Container = styled.View`
 const Contents = styled.Text`
   flex: 1;
   font-size: 14px;
-  color: ${({ theme }) => theme.text};
+  color: ${({ theme, completed }) => (completed ? theme.done : theme.text)};
   text-decoration-line: ${({ completed }) =>
     completed ? 'line-through' : 'none'};
 `;
