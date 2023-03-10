@@ -30,13 +30,45 @@ const App = () => {
 
   const [newTask, setNewTask] = useState('');
 
+  const [tasks, setTasks] = useState({
+    1: { id: '1', text: 'Hanbit', completed: false },
+    2: { id: '2', text: 'React Native', completed: true },
+    3: { id: '3', text: 'React Native Sample', completed: false },
+    4: { id: '4', text: 'Edit TODO ITEM', completed: false },
+  });
   const _addTask = () => {
-    alert(`Add: ${newTask}`);
+    const ID = Date.now().toString();
+    const newTaskObject = {
+      [ID]: { id: ID, text: newTask, completed: false },
+    };
+
     setNewTask('');
+    setTasks({ ...tasks, ...newTaskObject });
   };
+
+  const _deleteTask = id => {
+    const currentTasks = { ...tasks };
+    delete currentTasks[id];
+    setTasks(currentTasks);
+  };
+  const _toggleTask = id => {
+    const currentTasks = { ...tasks };
+    currentTasks[id]['completed'] = !currentTasks[id]['completed'];
+    setTasks(currentTasks);
+  };
+  const _updateTask = item => {
+    const currentTasks = { ...tasks };
+    currentTasks[item.id] = item;
+    setTasks(currentTasks);
+  };
+
   const _handleTextChange = text => {
     setNewTask(text);
     console.log(`변경된문자열:${newTask}`);
+  };
+
+  const _onBlur = () => {
+    setNewTask('');
   };
 
   return (
@@ -50,14 +82,22 @@ const App = () => {
         <Input
           value={newTask}
           placeholder="+ Add a Task"
-          onChangeText={_handleTextChange}
-          onSubmitEditing={_addTask}
+          onChangeText={_handleTextChange} //수정시
+          onSubmitEditing={_addTask} //완료버튼
+          onBlur={_onBlur} //포커스 잃었을때
         />
         <List width={width}>
-          <Task text="Hanbit" />
-          <Task text="React Native" />
-          <Task text="React Native Sample" />
-          <Task text="Edit TODO ITEM" />
+          {Object.values(tasks)
+            .reverse()
+            .map(item => (
+              <Task
+                key={item.id}
+                item={item}
+                deleteTask={_deleteTask}
+                toggleTask={_toggleTask}
+                updateTask={_updateTask}
+              />
+            ))}
         </List>
       </Container>
     </ThemeProvider>
