@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { StatusBar } from 'react-native';
+import { StatusBar, Dimensions } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components/native';
 import { theme } from './theme';
 import Input from './components/Input';
-import IconButton from './components/IconButton';
-import images from './images';
+import Task from './components/Task';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -21,8 +20,16 @@ const Title = styled.Text`
   margin: 0px 20px; /* y축 x축 */
 `;
 
+const List = styled.ScrollView`
+  flex: 1;
+  width: ${({ width }) => width - 40}px;
+`;
+
 const App = () => {
+  const width = Dimensions.get('window').width;
+
   const [newTask, setNewTask] = useState('');
+
   const _addTask = () => {
     alert(`Add: ${newTask}`);
     setNewTask('');
@@ -31,6 +38,7 @@ const App = () => {
     setNewTask(text);
     console.log(`변경된문자열:${newTask}`);
   };
+
   return (
     <ThemeProvider theme={theme}>
       <Container>
@@ -45,10 +53,12 @@ const App = () => {
           onChangeText={_handleTextChange}
           onSubmitEditing={_addTask}
         />
-        <IconButton type={images.uncompleted} />
-        <IconButton type={images.completed} />
-        <IconButton type={images.delete} />
-        <IconButton type={images.update} />
+        <List width={width}>
+          <Task text="Hanbit" />
+          <Task text="React Native" />
+          <Task text="React Native Sample" />
+          <Task text="Edit TODO ITEM" />
+        </List>
       </Container>
     </ThemeProvider>
   );
