@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StatusBar, Dimensions } from 'react-native';
+import { StatusBar, Dimensions, Alert } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components/native';
 import { theme } from './theme';
 import Input from './components/Input';
@@ -36,6 +36,7 @@ const App = () => {
     3: { id: '3', text: 'React Native Sample', completed: false },
     4: { id: '4', text: 'Edit TODO ITEM', completed: false },
   });
+
   const _addTask = () => {
     const ID = Date.now().toString();
     const newTaskObject = {
@@ -48,8 +49,23 @@ const App = () => {
 
   const _deleteTask = id => {
     const currentTasks = { ...tasks };
-    delete currentTasks[id];
-    setTasks(currentTasks);
+    Alert.alert('', '삭제하시겠습니까?', [
+      {
+        text: '아니오',
+        onPress() {
+          console.log('아니오');
+        },
+        style: 'cancel',
+      },
+      {
+        text: '예',
+        onPress() {
+          console.log('예');
+          delete currentTasks[id];
+          setTasks(currentTasks);
+        },
+      },
+    ]);
   };
   const _toggleTask = id => {
     const currentTasks = { ...tasks };
