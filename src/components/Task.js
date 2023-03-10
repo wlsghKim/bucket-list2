@@ -30,7 +30,7 @@ const Task = ({ item, deleteTask, toggleTask, updateTask }) => {
 
   const _onSubmitEditing = () => {
     if (isEditing) {
-      const editedTask = { ...item, ...{ text } };
+      const editedTask = { ...item, ...{ text } }; //Object.asing({},item,{text})
       setIsEditing(false);
       updateTask(editedTask);
     }

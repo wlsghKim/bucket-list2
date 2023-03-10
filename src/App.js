@@ -48,14 +48,13 @@ const App = () => {
   };
 
   const _deleteTask = id => {
-    const currentTasks = { ...tasks };
+    const currentTasks = { ...tasks }; //Object.assign({},tasks);
     Alert.alert('', '삭제하시겠습니까?', [
       {
         text: '아니오',
         onPress() {
           console.log('아니오');
         },
-        style: 'cancel',
       },
       {
         text: '예',
