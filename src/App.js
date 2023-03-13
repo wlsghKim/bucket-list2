@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import { StatusBar, Dimensions, Alert } from 'react-native';
 import styled, { ThemeProvider } from 'styled-components/native';
 import { theme } from './theme';
 import Input from './components/Input';
 import Task from './components/Task';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SplashScreen from 'expo-splash-screen';
 
 const Container = styled.SafeAreaView`
   flex: 1;
@@ -25,17 +27,68 @@ const List = styled.ScrollView`
   width: ${({ width }) => width - 40}px;
 `;
 
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
+
 const App = () => {
   const width = Dimensions.get('window').width;
 
+  const [isReady, setIsReady] = useState(false);
   const [newTask, setNewTask] = useState('');
 
-  const [tasks, setTasks] = useState({
-    1: { id: '1', text: 'Hanbit', completed: false },
-    2: { id: '2', text: 'React Native', completed: true },
-    3: { id: '3', text: 'React Native Sample', completed: false },
-    4: { id: '4', text: 'Edit TODO ITEM', completed: false },
-  });
+  const [tasks, setTasks] = useState({});
+  // {
+  //   1: { id: '1', text: 'Hanbit', completed: false },
+  //   2: { id: '2', text: 'React Native', completed: true },
+  //   3: { id: '3', text: 'React Native Sample', completed: false },
+  //   4: { id: '4', text: 'Edit TODO ITEM', completed: false },
+  // }
+  const _saveTasks = async tasks => {
+    try {
+      await AsyncStorage.setItem('tasks', JSON.stringify(tasks));
+      setTasks(tasks);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const _loadTasks = async () => {
+    try {
+      const loadedTasks = await AsyncStorage.getItem('tasks');
+      setTasks(JSON.parse(loadedTasks) || '{}');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        await _loadTasks();
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setIsReady(true);
+      }
+    }
+
+    prepare();
+  }, []);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (isReady) {
+      // This tells the splash screen to hide immediately! If we call this after
+      // `setAppIsReady`, then we may see a blank screen while the app is
+      // loading its initial state and rendering its first pixels. So instead,
+      // we hide the splash screen once we know the root view has already
+      // performed layout.
+      await SplashScreen.hideAsync();
+    }
+  }, [isReady]);
+
+  if (!isReady) {
+    return null;
+  }
 
   const _addTask = () => {
     const ID = Date.now().toString();
@@ -44,7 +97,7 @@ const App = () => {
     };
 
     setNewTask('');
-    setTasks({ ...tasks, ...newTaskObject });
+    _saveTasks({ ...tasks, ...newTaskObject });
   };
 
   const _deleteTask = id => {
@@ -61,7 +114,7 @@ const App = () => {
         onPress() {
           console.log('예');
           delete currentTasks[id];
-          setTasks(currentTasks);
+          _saveTasks(currentTasks);
         },
       },
     ]);
@@ -69,12 +122,12 @@ const App = () => {
   const _toggleTask = id => {
     const currentTasks = { ...tasks };
     currentTasks[id]['completed'] = !currentTasks[id]['completed'];
-    setTasks(currentTasks);
+    _saveTasks(currentTasks);
   };
   const _updateTask = item => {
     const currentTasks = { ...tasks };
     currentTasks[item.id] = item;
-    setTasks(currentTasks);
+    _saveTasks(currentTasks);
   };
 
   const _handleTextChange = text => {
@@ -88,7 +141,7 @@ const App = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <Container>
+      <Container onLayout={onLayoutRootView}>
         <StatusBar
           barStyle="light-content"
           backgroundColor={theme.background}
