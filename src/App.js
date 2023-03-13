@@ -78,7 +78,7 @@ const App = () => {
   const onLayoutRootView = useCallback(async () => {
     if (isReady) {
       // This tells the splash screen to hide immediately! If we call this after
-      // `setAppIsReady`, then we may see a blank screen while the app is
+      // `setIsReady`, then we may see a blank screen while the app is
       // loading its initial state and rendering its first pixels. So instead,
       // we hide the splash screen once we know the root view has already
       // performed layout.
@@ -102,6 +102,7 @@ const App = () => {
 
   const _deleteTask = id => {
     const currentTasks = { ...tasks }; //Object.assign({},tasks);
+
     Alert.alert('', '삭제하시겠습니까?', [
       {
         text: '아니오',
@@ -119,11 +120,13 @@ const App = () => {
       },
     ]);
   };
+
   const _toggleTask = id => {
     const currentTasks = { ...tasks };
     currentTasks[id]['completed'] = !currentTasks[id]['completed'];
     _saveTasks(currentTasks);
   };
+
   const _updateTask = item => {
     const currentTasks = { ...tasks };
     currentTasks[item.id] = item;
