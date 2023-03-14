@@ -27,6 +27,23 @@ const List = styled.ScrollView`
   width: ${({ width }) => width - 40}px;
 `;
 
+const AllItemDelBtn = ({ width, onPress, title }) => {
+  return (
+    <Pressable
+      style={{
+        backgroundColor: '#666',
+        width: width - 40,
+        margin: 5,
+      }}
+      onPress={onPress}
+    >
+      <Text style={{ textAlign: 'center', padding: 5, color: '#fff' }}>
+        {title}
+      </Text>
+    </Pressable>
+  );
+};
+
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
 
@@ -55,7 +72,7 @@ const App = () => {
   const _loadTasks = async () => {
     try {
       const loadedTasks = await AsyncStorage.getItem('tasks');
-      setTasks(JSON.parse(loadedTasks) || '{}');
+      setTasks(JSON.parse(loadedTasks) || {});
     } catch (e) {
       console.error(e);
     }
